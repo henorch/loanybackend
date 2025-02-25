@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Guarantor } from './GuarantorSchema.js';
+import  bcrypt  from 'bcryptjs'
 const { Schema } = mongoose;
 
 // Customers Schema
@@ -11,36 +12,33 @@ const CustomersSchema = new Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false
     },
     name: {
         type: String,
-        required: true
+        required: false
     },
     telephone: {
         type: String,
-        required: true
+        required: false
     },
     address: {
         type: String,
-        required: true
+        required: false
     },
     gender: {
         type: String,
-        required: true
+        required: false
     },
     nin: {
         type: String,
-        required: true
+        required: false
     },
     regnum: {
         type: String,
-        required: true
+        required: false
     },
-    token: {
-        type: String,
-        default: null
-    },
+
     guarantors: [
         {
             type: Schema.Types.ObjectId,
@@ -51,11 +49,10 @@ const CustomersSchema = new Schema({
 
 
 CustomersSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next(); // Only hash if password is modified
+    if (!this.isModified('password')) return next(); 
     try {
-        const hashedPassword = await bcrypt.hash(this.password, 10); // Hash password with 10 salt rounds
-        this.password = hashedPassword; // Save hashed password
-        next();
+        const hashedPassword = await bcrypt.hash(this.password, 10);
+        this.password = hashedPassword;
     } catch (error) {
         next(error);
     }
@@ -63,7 +60,7 @@ CustomersSchema.pre('save', async function (next) {
 
 CustomersSchema.methods.comparePassword = async function (password) {
     try {
-        return await bcrypt.compare(password, this.password); // Compare entered password with hashed password
+        return await bcrypt.compare(password, this.password); 
     } catch (error) {
         throw new Error('Password comparison failed');
     }
